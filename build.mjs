@@ -272,15 +272,18 @@ async function loadAvatarFiles() {
 }
 
 // Prepend the author's avatar to paragraphs that start with a bold name.
+// No real avatar available -> use avatars/fallback.png illustration instead.
 function injectAvatars(html, avatarFiles) {
   return html.replace(/<p>(<strong>[^<]{1,80}<\/strong>)/g, (m, strong) => {
     const plain = strong.replace(/<[^>]+>/g, '').toLowerCase();
+    if (/[^\x00-\x7f]/.test(plain)) return m; // skip CJK labels like 核心洞察
+    const img = (file) => `<img class="avatar" src="avatars/${file}" alt="" loading="lazy" onerror="this.onerror=null;this.src='avatars/fallback.png'">`;
     for (const [name, handle] of Object.entries(AVATARS)) {
-      if (plain.includes(name) && avatarFiles.has(handle)) {
-        return `<p class="has-avatar"><img class="avatar" src="avatars/${avatarFiles.get(handle)}" alt="" loading="lazy">` + strong;
+      if (plain.includes(name)) {
+        return `<p class="has-avatar">` + img(avatarFiles.has(handle) ? avatarFiles.get(handle) : 'fallback.png') + strong;
       }
     }
-    return m;
+    return `<p class="has-avatar">` + img('fallback.png') + strong;
   });
 }
 
