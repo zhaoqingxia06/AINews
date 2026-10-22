@@ -2,9 +2,9 @@
 
 每日追踪 AI builders（X 动态 + 播客 + 官方博客）的摘要站点，4 次/天自动生成。
 
-**站点**：https://zhaoqingxia06.github.io/ai-news/
+**站点**：https://zhaoqingxia06.github.io/AiNews/
 
-![daily-digest](https://github.com/zhaoqingxia06/ai-news/actions/workflows/daily-digest.yml/badge.svg)
+![daily-digest](https://github.com/zhaoqingxia06/AiNews/actions/workflows/daily-digest.yml/badge.svg)
 
 ## 状态徽章变红 = 站点没有最新一期
 
