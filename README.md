@@ -20,4 +20,6 @@
 
 - `.github/workflows/daily-digest.yml` — 每天 06:00 / 08:00 / 15:30 / 20:00（北京时间）各跑一次：抓取 feed → LLM 改写 → 构建站点 → 保鲜检查 → 提交推送（GitHub Pages 自动部署）。
 - `digests/YYYY-MM.zh.md` / `.en.md` — 月度存档，每天一个小节（`## YYYY-MM-DD`），小节末尾 `feed:` 行记录生成时所用 feed 快照。
-- `scripts/prepare-digest.js` — 拉取中央 feed；`scripts/remix.mjs` — 按天补齐/刷新期号；`build.mjs` — 生成单页 `index.html`。
+- `scripts/prepare-digest.js` — 拉取中央 feed；`scripts/remix.mjs` — 按天补齐/刷新期号；`build.mjs` — 生成单页 `index.html` 与人物页。
+- `u/<handle>.html` — 每位 builder 的人物时间线：全部往期摘录按时间倒序排列，中英双语，顶部带发文节奏图。首页点作者头像进入。由 `build.mjs` 调用 `author-pages.mjs` / `author-pages.css` 在每次构建时重新生成。
+- `.nojekyll` — GitHub Pages 不做 Jekyll 处理，否则 `_catwu.jpg`、`u/_catwu.html` 这类下划线开头的文件不会被发布。

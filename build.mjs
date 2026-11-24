@@ -3,9 +3,10 @@
 // emits ~/.follow-builders/site/index.html — calendar heatmap on top, all
 // digests below, heatmap cells link to each day's article. No dependencies.
 
-import { readdir, readFile, writeFile, rename } from 'fs/promises';
+import { readdir, readFile, writeFile, rename, mkdir, unlink } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { renderAuthorPage } from './author-pages.mjs';
 
 // Resolve paths relative to this script so the build runs both locally
 // (~/.follow-builders/site = repo root) and inside GitHub Actions (repo
@@ -75,12 +76,44 @@ function parseKeywords(md) {
   return { ...meta, body };
 }
 
-// snowflake id -> 发帖时间的北京时间字符串（MM-DD HH:MM）
-function tweetBjTime(id) {
+// snowflake id -> posting time in Beijing, both languages
+function tweetStamp(id) {
   try {
     const d = new Date(Number((BigInt(id) >> 22n) + 1288834974657n) + 8 * 3600e3);
-    return d.toISOString().slice(5, 10).replace('-', '月') + '日 ' + d.toISOString().slice(11, 16);
-  } catch { return ''; }
+    const p = (n) => String(n).padStart(2, '0');
+    return {
+      zh: (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日 ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()),
+      en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()]
+        + ' ' + d.getUTCDate() + ' ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()),
+    };
+  } catch { return null; }
+}
+
+// source chip variant used on the author timelines: same look as the digest,
+// but the label and the timestamp follow the language toggle
+function authorChip(url) {
+  let zh = '原文';
+  let en = 'Source';
+  let stamp = null;
+  try {
+    const h = new URL(url).hostname.replace(/^www\./, '');
+    if (/^(x|twitter)\.com$/.test(h)) {
+      zh = 'X 原文'; en = 'Original post';
+      const st = url.match(/\/[^/]+\/status(?:es)?\/(\d+)/);
+      if (st) stamp = tweetStamp(st[1]);
+    } else if (h.includes('youtu')) { zh = 'YouTube'; en = 'YouTube'; }
+    else if (h === 'github.com') { zh = 'GitHub'; en = 'GitHub'; }
+    else { zh = h; en = h; }
+  } catch {}
+  const time = stamp ? '<span class="src-time"><span class="lang-zh">' + stamp.zh + '</span><span class="lang-en">' + stamp.en + '</span></span>' : '';
+  return '<div class="src"><a class="src-link" href="' + url + '" target="_blank" rel="noopener" title="' + url + '">'
+    + ICON_LINK + '<span class="lang-zh">' + zh + '</span><span class="lang-en">' + en + '</span>' + time + '</a></div>';
+}
+
+// snowflake id -> 发帖时间的北京时间字符串（MM-DD HH:MM）
+function tweetBjTime(id) {
+  const s = tweetStamp(id);
+  return s ? s.zh : '';
 }
 
 function srcChip(url) {
@@ -274,17 +307,182 @@ async function loadAvatarFiles() {
 // Prepend the author's avatar to paragraphs that start with a bold name.
 // No real avatar available -> use avatars/fallback.png illustration instead.
 function injectAvatars(html, avatarFiles) {
+  const img = (file) => `<img class="avatar" src="avatars/${file}" alt="" loading="lazy" onerror="this.onerror=null;this.src='avatars/fallback.png'">`;
   return html.replace(/<p>(<strong>[^<]{1,80}<\/strong>)/g, (m, strong) => {
     const plain = strong.replace(/<[^>]+>/g, '').toLowerCase();
     if (/[^\x00-\x7f]/.test(plain)) return m; // skip CJK labels like 核心洞察
-    const img = (file) => `<img class="avatar" src="avatars/${file}" alt="" loading="lazy" onerror="this.onerror=null;this.src='avatars/fallback.png'">`;
     for (const [name, handle] of Object.entries(AVATARS)) {
       if (plain.includes(name)) {
-        return `<p class="has-avatar">` + img(avatarFiles.has(handle) ? avatarFiles.get(handle) : 'fallback.png') + strong;
+        const file = avatarFiles.has(handle) ? avatarFiles.get(handle) : 'fallback.png';
+        // the portrait is the door into that person's full timeline
+        const label = strong.replace(/<[^>]+>/g, '').trim();
+        const tip = `查看${label}的往期时间线 · ${label}'s timeline`;
+        return `<p class="has-avatar"><a class="avatar-link" href="u/${handle}.html" title="${escapeHtml(tip)}" aria-label="${escapeHtml(tip)}">`
+          + img(file) + '</a>' + strong;
       }
     }
     return `<p class="has-avatar">` + img('fallback.png') + strong;
   });
+}
+
+// ---------- per-builder timelines ----------
+
+const AUTHOR_KEYS = Object.keys(AVATARS).sort((a, b) => b.length - a.length);
+
+// Split a day body into blank-line-separated blocks and lift the trailing
+// standalone URLs off each block (they are the post's sources). Block order
+// is the digest's reading order, which is also the order posts were written.
+function blockSplit(md) {
+  const blocks = [];
+  let cur = [];
+  let sec = 'other';
+  const secOf = (line) => {
+    if (/𝕏/.test(line)) return 'x';
+    if (/🎙/.test(line)) return 'pod';
+    if (/📰/.test(line)) return 'blog';
+    if (/🧭/.test(line)) return 'insight';
+    return 'other';
+  };
+  for (const raw of md.split('\n')) {
+    const line = raw.trim();
+    if (!line) { if (cur.length) { blocks.push([sec, cur]); cur = []; } continue; }
+    if (/^##\s/.test(line)) { // section headers bound the matching below
+      if (cur.length) { blocks.push([sec, cur]); cur = []; }
+      sec = secOf(line);
+      continue;
+    }
+    cur.push(line);
+  }
+  if (cur.length) blocks.push([sec, cur]);
+  return blocks.map(([section, lines]) => {
+    const urls = [];
+    while (lines.length && /^https?:\/\/\S+$/.test(lines[lines.length - 1])) urls.unshift(lines.pop());
+    return { md: lines.join('\n'), urls, sec: section };
+  });
+}
+
+// A post is a block that opens with a tracked builder's bold name.
+function blockAuthor(md) {
+  const m = md.match(/^\*\*([^*]+?)\*\*/);
+  if (!m) return null;
+  const display = m[1].replace(/[：:\s]+$/, '').trim();
+  const low = display.toLowerCase();
+  const key = AUTHOR_KEYS.find((k) => low.startsWith(k));
+  return key ? { key, handle: AVATARS[key], display } : null;
+}
+
+// Drop the leading "**Name**（role）" prefix plus dangling punctuation —
+// used to build a language-independent dedupe key for posts with no URLs.
+function stripBlockHead(md) {
+  return md
+    .replace(/^\*\*[^*]+\*\*/, '')
+    .replace(/^（[^）]*）/, '')
+    .replace(/^\([^)]*\)/, '')
+    .replace(/^[：:，,、。\s]+/, '')
+    .trim();
+}
+
+// Pair every Chinese post with its English counterpart. The translation is
+// not paragraph-aligned with the digest, so anchor on the bold name first,
+// then on the shared source URLs, then on the name appearing up front.
+function collectAuthors(entries, avatarFiles) {
+  const authors = new Map();
+  const seen = new Map(); // handle -> Set(dedupe key)
+  for (const e of entries) { // newest first
+    if (!e.zh) continue;
+    const zh = blockSplit(e.zh.md);
+    const en = e.en ? blockSplit(e.en.md) : [];
+    const usedEn = new Set();
+    const enByName = new Map();
+    const enByUrl = new Map();
+    en.forEach((b, i) => {
+      const au = blockAuthor(b.md);
+      if (au) {
+        const arr = enByName.get(au.handle) || [];
+        arr.push(i);
+        enByName.set(au.handle, arr);
+      }
+      for (const u of b.urls) if (!enByUrl.has(u)) enByUrl.set(u, i);
+    });
+    // posts keep the digest's order, so prefer an English block that sits
+    // after the previous match for this person; only then look backwards.
+    const lastEn = new Map();
+    const ordered = (handle, idxs) => {
+      const after = lastEn.has(handle) ? lastEn.get(handle) : -1;
+      return idxs.filter((i) => i > after).concat(idxs.filter((i) => i <= after));
+    };
+    // stays inside the same section (X posts ≠ podcasts) — otherwise a podcast
+    // blurb that name-drops the builder would be mistaken for their post
+    const pickEn = (post, handle) => {
+      const inSec = (idxs) => idxs.filter((i) => en[i].sec === post.sec);
+      for (const i of ordered(handle, inSec(enByName.get(handle) || []))) if (!usedEn.has(i)) return i;
+      const urls = [];
+      for (const u of post.urls) { const i = enByUrl.get(u); if (i !== undefined && !urls.includes(i)) urls.push(i); }
+      for (const i of ordered(handle, inSec(urls))) if (!usedEn.has(i)) return i;
+      const head = handle.toLowerCase();
+      const mentioned = [];
+      for (let i = 0; i < en.length; i++) {
+        if (en[i].md.slice(0, 60).toLowerCase().includes(head)) mentioned.push(i);
+      }
+      for (const i of ordered(handle, inSec(mentioned))) if (!usedEn.has(i)) return i;
+      return -1;
+    };
+
+    for (const post of zh) {
+      const au = blockAuthor(post.md);
+      if (!au) continue;
+      const body = stripBlockHead(post.md);
+      // the same tweet is often recapped on consecutive days — keep the newest
+      const sig = post.urls.length ? post.urls.slice().sort().join(' ') : body.slice(0, 60);
+      const seenSet = seen.get(au.handle) || new Set();
+      if (seenSet.has(sig)) continue;
+      seenSet.add(sig);
+      seen.set(au.handle, seenSet);
+
+      const enIdx = pickEn(post, au.key);
+      if (enIdx >= 0) { usedEn.add(enIdx); lastEn.set(au.key, enIdx); }
+
+      const rec = authors.get(au.handle) || { handle: au.handle, name: au.display, posts: [], dayCounts: {} };
+      // the digest sentence was written with the bold name as its subject,
+      // so keep it — but as a small label instead of a second headline
+      const withHead = (md) => mdToHtml(md).replace(/^<p><strong>/, '<p><strong class="by">');
+      rec.posts.push({
+        key: e.key,
+        zhHtml: withHead(post.md),
+        enHtml: enIdx >= 0 ? withHead(en[enIdx].md) : '',
+        chips: post.urls.map(authorChip).join(''),
+      });
+      rec.dayCounts[e.key] = (rec.dayCounts[e.key] || 0) + 1;
+      authors.set(au.handle, rec);
+    }
+  }
+
+  return [...authors.values()]
+    .map((a) => {
+      a.posts.sort((x, y) => y.key.localeCompare(x.key)); // stable: keeps within-day order
+      a.firstKey = a.posts[a.posts.length - 1].key;
+      a.lastKey = a.posts[0].key;
+      a.avatar = avatarFiles.has(a.handle) ? avatarFiles.get(a.handle) : 'fallback.png';
+      return a;
+    })
+    .sort((x, y) => y.posts.length - x.posts.length);
+}
+
+async function writeAuthorPages(authors) {
+  const dir = join(scriptDir, 'u');
+  await mkdir(dir, { recursive: true });
+  const keep = new Set();
+  for (const a of authors) {
+    const file = join(dir, a.handle + '.html');
+    await writeFile(file + '.tmp', renderAuthorPage(a), 'utf-8');
+    await rename(file + '.tmp', file);
+    keep.add(a.handle + '.html');
+  }
+  // drop timelines for builders that no longer appear in any digest
+  for (const f of await readdir(dir)) {
+    if (f.endsWith('.html') && !keep.has(f)) await unlink(join(dir, f));
+  }
+  console.log('OK ' + dir + ' — ' + authors.length + ' author timeline(s)');
 }
 
 // ---------- generative cover art & section icons ----------
@@ -343,6 +541,9 @@ async function main() {
 
   const kwChips = (md) => parseKeywords(md).kw.map((k) => `<span class="kw">#${escapeHtml(k)}</span>`).join('');
   const avatarFiles = await loadAvatarFiles();
+  // per-builder timeline pages (u/<handle>.html), rebuilt with every digest
+  const authors = collectAuthors(entries, avatarFiles);
+  await writeAuthorPages(authors);
   const langDiv = (l, rec, dayKey) => {
     if (!rec) return '';
     const { kw, headline, deck, body } = parseKeywords(rec.md);
@@ -581,10 +782,19 @@ async function main() {
   /* ---------- avatars ---------- */
   p.has-avatar { display: flow-root; }
   .avatar {
-    float: left; width: 46px; height: 46px; border-radius: 50%;
-    margin: 8px 14px 4px 0;
+    display: block; width: 46px; height: 46px; border-radius: 50%;
     border: 1px solid var(--line); background: var(--paper);
   }
+  /* untracked names keep a plain floated portrait */
+  p.has-avatar > .avatar { float: left; margin: 8px 14px 4px 0; }
+  /* tracked names: the portrait is the door into that person's timeline */
+  article a.avatar-link {
+    float: left; margin: 8px 14px 4px 0; line-height: 0;
+    border-radius: 50%; border-bottom: 0; text-decoration: none;
+    transition: box-shadow 0.15s ease;
+  }
+  article a.avatar-link:hover { box-shadow: 0 0 0 3px var(--red-tint); }
+  article a.avatar-link:hover .avatar { border-color: var(--red); }
 
   /* ---------- product knowledge panel ---------- */
   .prod {

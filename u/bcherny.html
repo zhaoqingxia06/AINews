@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boris Cherny · AI News</title>
+<meta name="description" content="Boris Cherny (@bcherny) — 往期发言时间线，共 16 条。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens: same paper-and-red system as index.html ---------- */
+:root {
+  --paper: #f7f6f2;
+  --sheet: #ffffff;
+  --ink: #1a1918;
+  --gray: #74716b;
+  --line: #e6e4de;
+  --red: #e02d1b;
+  --red-deep: #b32112;
+  --red-tint: #fbece8;
+  --serif: "Noto Serif SC", "Songti SC", "STSong", Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 16px; line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--red); color: #fff; }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+a { color: inherit; }
+
+.wrap { max-width: 840px; margin: 0 auto; padding: 30px 40px 90px; }
+@media (max-width: 640px) { .wrap { padding: 22px 18px 64px; } }
+
+/* ---------- language toggle (same pill as the digest page) ---------- */
+body[data-lang="zh"] .lang-en { display: none; }
+body[data-lang="en"] .lang-zh { display: none; }
+.lang-switch {
+  position: fixed; top: 16px; right: 16px; z-index: 50;
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--sheet); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(26, 25, 24, 0.06);
+}
+@media (max-width: 1360px) {
+  .lang-switch { position: static; margin: 0 auto 18px; width: max-content; box-shadow: none; }
+}
+.sw-btn {
+  border: none; background: transparent; cursor: pointer;
+  font-size: 12.5px; line-height: 1.3; font-family: inherit;
+  padding: 4px 14px; border-radius: 999px; color: var(--gray);
+  transition: color 0.15s ease;
+}
+.sw-btn:hover:not(.on) { color: var(--ink); }
+.sw-btn.on { background: var(--ink); color: #fff; }
+
+/* ---------- crumb ---------- */
+.crumb { margin-bottom: 30px; }
+.back {
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gray); text-decoration: none;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.back:hover { color: var(--red-deep); border-bottom-color: var(--red); }
+
+/* ---------- who: portrait, nameplate, stats ---------- */
+.who {
+  display: grid; grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 24px; align-items: start;
+  padding-bottom: 28px; border-bottom: 1px solid var(--line);
+}
+.who-ava {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--line); background: var(--paper); display: block;
+}
+.who-kicker {
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--red); font-weight: 700; margin-bottom: 8px;
+}
+.who-name {
+  font-family: var(--serif); font-weight: 900;
+  font-size: clamp(28px, 4.6vw, 42px); line-height: 1.12;
+  letter-spacing: -0.01em; margin: 0;
+}
+.who-handle {
+  font-size: 13px; color: var(--gray); letter-spacing: 0.03em; margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.who-stats {
+  margin-top: 14px; font-size: 13px; color: #55524d; line-height: 1.8;
+  font-variant-numeric: tabular-nums;
+}
+.who-x {
+  align-self: center; white-space: nowrap;
+  font-size: 12.5px; font-weight: 600; text-decoration: none;
+  padding: 8px 17px; border: 1px solid var(--line); border-radius: 999px;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.who-x:hover { color: var(--red-deep); border-color: var(--red); background: var(--red-tint); }
+
+/* ---------- spark: posting rhythm, one square per day ---------- */
+.spark-wrap {
+  margin: 26px 0 4px; padding: 15px 18px 12px;
+  background: var(--sheet); border: 1px solid var(--line); border-radius: 12px;
+}
+.spark-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 12px;
+}
+.spark-range { letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.spark-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.spark-grid { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 2px; }
+.spark-col { display: flex; flex-direction: column; gap: 3px; flex: none; }
+.spark-cell {
+  width: 12px; height: 12px; border-radius: 2.5px; display: block;
+  background: #eeece6; transition: outline-color 0.12s ease;
+}
+.spark-cell.pad { background: transparent; }
+.spark-cell.lv1 { background: #f7dcd6; }
+.spark-cell.lv2 { background: #f0b4a8; }
+.spark-cell.lv3 { background: #e57763; }
+.spark-cell.lv4 { background: #c9301c; }
+a.spark-cell:hover { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.spark-legend {
+  display: flex; align-items: center; gap: 4px; flex: none;
+  font-size: 10px; color: var(--gray); letter-spacing: 0.02em;
+}
+.spark-legend .spark-cell { width: 9px; height: 9px; border-radius: 2px; }
+.spark-legend span { margin: 0 3px; }
+
+/* ---------- timeline ---------- */
+.tl { list-style: none; margin: 18px 0 0; padding: 0; }
+
+.month {
+  position: sticky; top: 0; z-index: 4;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; margin: 0; padding: 18px 0 10px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+  font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  font-weight: 700; color: var(--ink);
+}
+.m-lab::before {
+  content: ""; display: inline-block; width: 6px; height: 6px;
+  background: var(--red); margin-right: 9px; vertical-align: 1px;
+}
+.m-cnt { font-weight: 500; color: var(--gray); letter-spacing: 0.08em; }
+
+.day {
+  display: grid; grid-template-columns: 104px minmax(0, 1fr);
+  position: relative; padding-top: 26px;
+  scroll-margin-top: 58px;
+}
+.day::before {
+  content: ""; position: absolute; left: 104px; top: 0; bottom: 0;
+  width: 1px; background: #dedbd3;
+}
+.day:last-child::before { bottom: auto; height: 42px; }
+
+.day-date { text-align: right; padding-right: 24px; font-variant-numeric: tabular-nums; }
+.day-date time {
+  display: block; font-family: var(--serif); font-weight: 700;
+  font-size: 17px; line-height: 1.3; letter-spacing: 0.005em;
+}
+.day-wd {
+  display: block; font-size: 11px; color: var(--gray);
+  letter-spacing: 0.08em; margin-top: 3px;
+}
+.day-link {
+  display: inline-block; margin-top: 7px; font-size: 10.5px;
+  color: var(--gray); text-decoration: none; letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line); padding-bottom: 1px;
+}
+.day-link:hover { color: var(--red-deep); border-bottom-color: var(--red); }
+
+.day-main { position: relative; padding-left: 26px; }
+.day-main::before {
+  content: ""; position: absolute; left: -4.5px; top: 8px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--paper); border: 1.5px solid var(--red);
+}
+
+/* ---------- post card ---------- */
+.post {
+  background: var(--sheet); border: 1px solid var(--line);
+  border-radius: 12px; padding: 19px 22px 15px; margin-bottom: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.post:hover { border-color: #d9d6cf; box-shadow: 0 2px 12px rgba(26, 25, 24, 0.045); }
+.post-body { font-size: 15.5px; line-height: 1.86; color: #242322; }
+.post-body p { margin: 0 0 0.65em; }
+.post-body p:last-child { margin-bottom: 0; }
+.post-body strong { font-weight: 700; }
+.post-body em { font-style: italic; }
+.post-body a {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid rgba(224, 45, 27, 0.45);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.post-body a:hover { color: var(--red-deep); border-bottom-color: var(--red-deep); }
+.post-body strong.num { font-variant-numeric: tabular-nums; }
+.post-body .by {
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gray); font-weight: 700; margin-right: 4px;
+  font-family: var(--sans);
+}
+
+.zh-badge {
+  display: inline-block; margin: 8px 0 0; padding: 1px 8px;
+  font-size: 10.5px; letter-spacing: 0.04em; color: var(--gray);
+  border: 1px dashed var(--line); border-radius: 5px; line-height: 1.7;
+}
+
+.post-src { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 8px; }
+.post-src .src { display: inline-block; margin: 0; }
+.post-src a.src-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; line-height: 1.5; color: var(--gray);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 3px 11px; text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.post-src a.src-link:hover { color: var(--red-deep); border-color: var(--red); }
+.post-src .src-link svg { flex: none; }
+.post-src .src-time { color: var(--gray); font-weight: 400; }
+
+/* ---------- footer ---------- */
+.site {
+  margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line);
+  text-align: center; font-size: 12px; color: var(--gray); letter-spacing: 0.02em;
+}
+.site a { color: var(--gray); text-decoration: none; border-bottom: 1px solid rgba(224, 45, 27, 0.4); }
+.site a:hover { color: var(--red-deep); border-bottom-color: var(--red-deep); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 680px) {
+  .who { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; }
+  .who-ava { width: 64px; height: 64px; }
+  .who-x { grid-column: 1 / -1; justify-self: start; margin-top: 4px; }
+  .day { grid-template-columns: 1fr; padding-top: 22px; }
+  .day::before { display: none; }
+  .day-date {
+    text-align: left; padding: 0 0 10px; display: flex;
+    align-items: baseline; gap: 9px; flex-wrap: wrap;
+  }
+  .day-date time { font-size: 15px; }
+  .day-wd { margin: 0; }
+  .day-link { margin: 0 0 0 auto; }
+  .day-main { padding-left: 0; }
+  .day-main::before { display: none; }
+  .post { padding: 16px 16px 12px; }
+  .post-body { font-size: 15px; }
+  .spark-body { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .spark-grid { max-width: 100%; }
+}
+</style>
+</head>
+<body id="top" data-lang="zh">
+<div class="lang-switch" role="group" aria-label="语言 / Language"><button class="sw-btn" type="button" data-lang="zh">中文</button><button class="sw-btn" type="button" data-lang="en">EN</button></div>
+<div class="wrap">
+<nav class="crumb"><a class="back" href="../index.html">← <span class="lang-zh">全部期号</span><span class="lang-en">All issues</span></a></nav>
+<header class="who">
+<img class="who-ava" src="../avatars/bcherny.jpg" alt="" onerror="this.src='../avatars/fallback.png'">
+<div class="who-id">
+<div class="who-kicker"><span class="lang-zh">人物时间线</span><span class="lang-en">Timeline</span></div>
+<h1 class="who-name">Boris Cherny</h1>
+<div class="who-handle">@bcherny</div>
+<div class="who-stats"><span class="lang-zh">16 条摘录 · 16 天 · 2026 年 9 月 17 日 → 2026 年 11 月 10 日</span><span class="lang-en">16 posts · 16 days · Sep 17, 2026 → Nov 10, 2026</span></div>
+</div>
+<a class="who-x" href="https://x.com/bcherny" target="_blank" rel="noopener"><span class="lang-zh">在 X 打开</span><span class="lang-en">Open on X</span> ↗</a>
+</header>
+<section class="spark-wrap"><div class="spark-head"><span class="lang-zh">发文节奏</span><span class="lang-en">Posting rhythm</span><span class="spark-range">2026-09-17 → 2026-11-10</span></div><div class="spark-body"><div class="spark-grid"><div class="spark-col"><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span><a class="spark-cell lv1" href="#d-2026-09-17" title="2026 年 9 月 17 日 · 1" aria-label="2026 年 9 月 17 日 · 1"></a><span class="spark-cell lv0" title="2026-09-18"></span><a class="spark-cell lv1" href="#d-2026-09-19" title="2026 年 9 月 19 日 · 1" aria-label="2026 年 9 月 19 日 · 1"></a><span class="spark-cell lv0" title="2026-09-20"></span></div><div class="spark-col"><a class="spark-cell lv1" href="#d-2026-09-21" title="2026 年 9 月 21 日 · 1" aria-label="2026 年 9 月 21 日 · 1"></a><span class="spark-cell lv0" title="2026-09-22"></span><span class="spark-cell lv0" title="2026-09-23"></span><a class="spark-cell lv1" href="#d-2026-09-24" title="2026 年 9 月 24 日 · 1" aria-label="2026 年 9 月 24 日 · 1"></a><a class="spark-cell lv1" href="#d-2026-09-25" title="2026 年 9 月 25 日 · 1" aria-label="2026 年 9 月 25 日 · 1"></a><span class="spark-cell lv0" title="2026-09-26"></span><a class="spark-cell lv1" href="#d-2026-09-27" title="2026 年 9 月 27 日 · 1" aria-label="2026 年 9 月 27 日 · 1"></a></div><div class="spark-col"><span class="spark-cell lv0" title="2026-09-28"></span><a class="spark-cell lv1" href="#d-2026-09-29" title="2026 年 9 月 29 日 · 1" aria-label="2026 年 9 月 29 日 · 1"></a><span class="spark-cell lv0" title="2026-09-30"></span><span class="spark-cell lv0" title="2026-10-01"></span><a class="spark-cell lv1" href="#d-2026-10-02" title="2026 年 10 月 2 日 · 1" aria-label="2026 年 10 月 2 日 · 1"></a><span class="spark-cell lv0" title="2026-10-03"></span><span class="spark-cell lv0" title="2026-10-04"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-10-05"></span><span class="spark-cell lv0" title="2026-10-06"></span><a class="spark-cell lv1" href="#d-2026-10-07" title="2026 年 10 月 7 日 · 1" aria-label="2026 年 10 月 7 日 · 1"></a><a class="spark-cell lv1" href="#d-2026-10-08" title="2026 年 10 月 8 日 · 1" aria-label="2026 年 10 月 8 日 · 1"></a><span class="spark-cell lv0" title="2026-10-09"></span><span class="spark-cell lv0" title="2026-10-10"></span><span class="spark-cell lv0" title="2026-10-11"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-10-12"></span><span class="spark-cell lv0" title="2026-10-13"></span><span class="spark-cell lv0" title="2026-10-14"></span><span class="spark-cell lv0" title="2026-10-15"></span><a class="spark-cell lv1" href="#d-2026-10-16" title="2026 年 10 月 16 日 · 1" aria-label="2026 年 10 月 16 日 · 1"></a><a class="spark-cell lv1" href="#d-2026-10-17" title="2026 年 10 月 17 日 · 1" aria-label="2026 年 10 月 17 日 · 1"></a><span class="spark-cell lv0" title="2026-10-18"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-10-19"></span><span class="spark-cell lv0" title="2026-10-20"></span><span class="spark-cell lv0" title="2026-10-21"></span><span class="spark-cell lv0" title="2026-10-22"></span><a class="spark-cell lv1" href="#d-2026-10-23" title="2026 年 10 月 23 日 · 1" aria-label="2026 年 10 月 23 日 · 1"></a><span class="spark-cell lv0" title="2026-10-24"></span><span class="spark-cell lv0" title="2026-10-25"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-10-26"></span><span class="spark-cell lv0" title="2026-10-27"></span><span class="spark-cell lv0" title="2026-10-28"></span><span class="spark-cell lv0" title="2026-10-29"></span><span class="spark-cell lv0" title="2026-10-30"></span><a class="spark-cell lv1" href="#d-2026-10-31" title="2026 年 10 月 31 日 · 1" aria-label="2026 年 10 月 31 日 · 1"></a><span class="spark-cell lv0" title="2026-11-01"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-11-02"></span><span class="spark-cell lv0" title="2026-11-03"></span><a class="spark-cell lv1" href="#d-2026-11-04" title="2026 年 11 月 4 日 · 1" aria-label="2026 年 11 月 4 日 · 1"></a><span class="spark-cell lv0" title="2026-11-05"></span><span class="spark-cell lv0" title="2026-11-06"></span><span class="spark-cell lv0" title="2026-11-07"></span><span class="spark-cell lv0" title="2026-11-08"></span></div><div class="spark-col"><span class="spark-cell lv0" title="2026-11-09"></span><a class="spark-cell lv1" href="#d-2026-11-10" title="2026 年 11 月 10 日 · 1" aria-label="2026 年 11 月 10 日 · 1"></a><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span></div></div><div class="spark-legend"><span class="lang-zh">少</span><span class="lang-en">Less</span><i class="spark-cell lv1"></i><i class="spark-cell lv2"></i><i class="spark-cell lv3"></i><i class="spark-cell lv4"></i><span class="lang-zh">多</span><span class="lang-en">More</span></div></div></section>
+<ol class="tl"><li class="month"><span class="m-lab"><span class="lang-zh">2026 年 11 月</span><span class="lang-en">Nov 2026</span></span><span class="m-cnt"><span class="lang-zh">2 条</span><span class="lang-en">2 posts</span></span></li><li class="day" id="d-2026-11-10"><div class="day-date"><time datetime="2026-11-10"><span class="lang-zh">11.10</span><span class="lang-en">Nov 10</span></time><span class="day-wd"><span class="lang-zh">周二</span><span class="lang-en">Tue</span></span><a class="day-link" href="../index.html#d-2026-11-10"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 解释了 <strong>Fable 5.2</strong> 的订阅重置规则：Pro 用户获得一次重置，Max、Ultra 和 Team Premium 最多三次，具体取决于订阅时长。他强调这是为了回馈订阅最久的用户。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> explained Fable 5.2 resets: Pro users get one, while Max, Ultra and Team Premium get up to three depending on how long they have subscribed, a thank-you to the longest-tenured users.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2119890820186976763" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2119890820186976763"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">11月10日 04:32</span><span class="lang-en">Nov 10 04:32</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2119873095129550880" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2119873095129550880"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">11月10日 03:21</span><span class="lang-en">Nov 10 03:21</span></span></a></div></div></article></div></li><li class="day" id="d-2026-11-04"><div class="day-date"><time datetime="2026-11-04"><span class="lang-zh">11.4</span><span class="lang-en">Nov 4</span></time><span class="day-wd"><span class="lang-zh">周三</span><span class="lang-en">Wed</span></span><a class="day-link" href="../index.html#d-2026-11-04"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 宣布 Claude 现在可以自动连接企业插件，不再需要逐个登录。Team 和 Enterprise 管理员统一配置后，团队成员首次使用插件时即自动连上。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> noted that signing in to your company's plugins one by one is annoying, so Claude now auto-connects to them. Team and Enterprise admins can set them up, and teammates are connected automatically the first time they use the plugins.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2117693181651542387" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2117693181651542387"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">11月4日 02:59</span><span class="lang-en">Nov 4 02:59</span></span></a></div></div></article></div></li><li class="month"><span class="m-lab"><span class="lang-zh">2026 年 10 月</span><span class="lang-en">Oct 2026</span></span><span class="m-cnt"><span class="lang-zh">7 条</span><span class="lang-en">7 posts</span></span></li><li class="day" id="d-2026-10-31"><div class="day-date"><time datetime="2026-10-31"><span class="lang-zh">10.31</span><span class="lang-en">Oct 31</span></time><span class="day-wd"><span class="lang-zh">周六</span><span class="lang-en">Sat</span></span><a class="day-link" href="../index.html#d-2026-10-31"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 宣布正在为已验证的 <strong>Ultra</strong> 账户移除 5 小时限制。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> kept it short: the 5-hour limit is being removed for verified <strong>Ultra</strong> accounts.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2116222842413142111" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2116222842413142111"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月31日 01:36</span><span class="lang-en">Oct 31 01:36</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-23"><div class="day-date"><time datetime="2026-10-23"><span class="lang-zh">10.23</span><span class="lang-en">Oct 23</span></time><span class="day-wd"><span class="lang-zh">周五</span><span class="lang-en">Fri</span></span><a class="day-link" href="../index.html#d-2026-10-23"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 宣布 <strong>Agent Skills</strong> 最初只是 <strong>Claude Code</strong> 中的一个实验，如今已被业界广泛采用，Anthropic 认为把它捐给 <strong>Agentic AI 基金会</strong>、与 <strong>MCP</strong> 并列更为合适。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> noted that <strong>Agent Skills</strong> started as an experiment in <strong>Claude Code</strong>, and with much of the industry adopting it, Anthropic found it fitting to donate it to the <strong>Agentic AI Foundation</strong>, next to <strong>MCP</strong>.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2113333859907747871" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2113333859907747871"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月23日 02:17</span><span class="lang-en">Oct 23 02:17</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-17"><div class="day-date"><time datetime="2026-10-17"><span class="lang-zh">10.17</span><span class="lang-en">Oct 17</span></time><span class="day-wd"><span class="lang-zh">周六</span><span class="lang-en">Sat</span></span><a class="day-link" href="../index.html#d-2026-10-17"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 直言别低估 <strong>Claude Slides</strong>，他现在做幻灯片全靠它，不用再去搜 &quot;iphone frame svg&quot;。他还说无法想象没有 <strong>Claude Code Review</strong> 的工作方式，它跑在他所有 PR 上，几乎在 bug 上线前全部拦下，这是他和小团队既能提速又能抬高质量门槛的秘诀之一。</p></div><div class="post-body lang-en"><p>Boris Cherny is now building slide decks with <strong>Claude Slides</strong>, ditching the old workflow of googling &quot;iphone frame svg.&quot; He also leans heavily on <strong>Claude Code Review</strong>, which runs on all his PRs and catches almost every bug before it ships, calling it part of the secret sauce that lets the team move fast while raising the quality bar.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2111158659971699136" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2111158659971699136"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月17日 02:13</span><span class="lang-en">Oct 17 02:13</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2111158313463525518" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2111158313463525518"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月17日 02:12</span><span class="lang-en">Oct 17 02:12</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-16"><div class="day-date"><time datetime="2026-10-16"><span class="lang-zh">10.16</span><span class="lang-en">Oct 16</span></time><span class="day-wd"><span class="lang-zh">周五</span><span class="lang-en">Fri</span></span><a class="day-link" href="../index.html#d-2026-10-16"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 表示过去几年 Claude 模型在 <strong>prompt injection</strong> 上取得了显著进展，但随着 <strong>agent</strong> 承担的任务越来越多，在全行业范围内解决这一问题正变得愈发紧迫。他宣布与 <strong>Gray Swan</strong> 合作举办相关竞赛，并期待看到参赛者的发现。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> framed <strong>prompt injection</strong> as the defining unsolved problem for agents: after years of progress on Claude models, he argues it is increasingly urgent to solve it across the industry as agents take on more work. He announced a partnership with Gray Swan to host a competition and invited researchers to submit findings.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2110791698611855624" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2110791698611855624"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月16日 01:55</span><span class="lang-en">Oct 16 01:55</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-08"><div class="day-date"><time datetime="2026-10-08"><span class="lang-zh">10.8</span><span class="lang-en">Oct 8</span></time><span class="day-wd"><span class="lang-zh">周四</span><span class="lang-en">Thu</span></span><a class="day-link" href="../index.html#d-2026-10-08"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 分享了用 Claude 一次性完成任务的体验，称&quot;就一个 prompt，Claude 验证得也相当好，目前没有 bug&quot;，并邀请大家试用。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> shared that a single prompt produced working code with Claude verifying it well, reporting no bugs so far. He pointed followers to try it directly.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2108013947144085714" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2108013947144085714"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月8日 09:57</span><span class="lang-en">Oct 8 09:57</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2108008010253533397" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2108008010253533397"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月8日 09:34</span><span class="lang-en">Oct 8 09:34</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2108006118966665463" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2108006118966665463"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月8日 09:26</span><span class="lang-en">Oct 8 09:26</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-07"><div class="day-date"><time datetime="2026-10-07"><span class="lang-zh">10.7</span><span class="lang-en">Oct 7</span></time><span class="day-wd"><span class="lang-zh">周三</span><span class="lang-en">Wed</span></span><a class="day-link" href="../index.html#d-2026-10-07"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 公开了自己真实的 Claude prompts，强调 prompting 没有秘密：像和同事说话一样与 Claude 对话即可，没必要过度小心地雕琢指令，还附上了实际使用的 prompt。他对「大家居然对这种用法感到惊讶」表示意外，并又补了一个例子。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> published his actual Claude prompts, arguing there is no secret to prompting: talk to Claude the way you would a coworker, no need to be overly careful crafting instructions. He was surprised people are surprised this is how he prompts, and followed up with another example.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2107532985897771152" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2107532985897771152"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月7日 02:06</span><span class="lang-en">Oct 7 02:06</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2107565388250874193" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2107565388250874193"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月7日 04:15</span><span class="lang-en">Oct 7 04:15</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2107565497680314831" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2107565497680314831"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月7日 04:15</span><span class="lang-en">Oct 7 04:15</span></span></a></div></div></article></div></li><li class="day" id="d-2026-10-02"><div class="day-date"><time datetime="2026-10-02"><span class="lang-zh">10.2</span><span class="lang-en">Oct 2</span></time><span class="day-wd"><span class="lang-zh">周五</span><span class="lang-en">Fri</span></span><a class="day-link" href="../index.html#d-2026-10-02"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 宣布 <strong>Claude Mods</strong> 上线，用户可以通过 prompt 自定义 Claude 的工作方式和外观，还能把 mods 作为插件分享给别人。他强调每个人工作方式不同，没有理由所有人的 Claude 体验都一样。</p></div><div class="post-body lang-en"><p>Boris Cherny highlighted mods in Claude, which let you customize Claude to work and look the way you want by just prompting it. Each person works differently, so there is no reason everyone should have an identical Claude experience, and mods can be shared as plugins.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2105756563302723721" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2105756563302723721"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月2日 04:27</span><span class="lang-en">Oct 2 04:27</span></span></a></div></div></article></div></li><li class="month"><span class="m-lab"><span class="lang-zh">2026 年 9 月</span><span class="lang-en">Sep 2026</span></span><span class="m-cnt"><span class="lang-zh">7 条</span><span class="lang-en">7 posts</span></span></li><li class="day" id="d-2026-09-29"><div class="day-date"><time datetime="2026-09-29"><span class="lang-zh">9.29</span><span class="lang-en">Sep 29</span></time><span class="day-wd"><span class="lang-zh">周二</span><span class="lang-en">Tue</span></span><a class="day-link" href="../index.html#d-2026-09-29"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 分享了 <strong>Sonnet 5.5</strong> 在 <strong>Claude Code</strong> 中修复 bug 的表现，速度提升 <strong class="num">30%</strong>，用量减少 <strong class="num">30%</strong>。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> showed <strong>Sonnet 5.5</strong> fixing a bug with <strong>Claude Code</strong>, noting it is <strong class="num">30%</strong> faster and uses <strong class="num">30%</strong> less usage.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2104638725317923228" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2104638725317923228"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月29日 02:25</span><span class="lang-en">Sep 29 02:25</span></span></a></div></div></article></div></li><li class="day" id="d-2026-09-27"><div class="day-date"><time datetime="2026-09-27"><span class="lang-zh">9.27</span><span class="lang-en">Sep 27</span></time><span class="day-wd"><span class="lang-zh">周日</span><span class="lang-en">Sun</span></span><a class="day-link" href="../index.html#d-2026-09-27"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong>（Claude Code @anthropicai）：他提到 <strong>Tag</strong> 每天写下他超过 <strong class="num">50%</strong> 的 PR，还承担约 <strong class="num">100%</strong> 的数据分析，并修复大部分产品反馈与 bug。他强调这不是普通 Slack bot，而是主动、可编程、有记忆的 agent。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong>（Claude Code @anthropicai）：他提到 <strong>Tag</strong> 每天写下他超过 <strong class="num">50%</strong> 的 PR，还承担约 <strong class="num">100%</strong> 的数据分析，并修复大部分产品反馈与 bug。他强调这不是普通 Slack bot，而是主动、可编程、有记忆的 agent。</p><span class="zh-badge">中文摘要 · no English summary</span></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2103538666597691552" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2103538666597691552"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月26日 01:34</span><span class="lang-en">Sep 26 01:34</span></span></a></div></div></article></div></li><li class="day" id="d-2026-09-25"><div class="day-date"><time datetime="2026-09-25"><span class="lang-zh">9.25</span><span class="lang-en">Sep 25</span></time><span class="day-wd"><span class="lang-zh">周五</span><span class="lang-en">Fri</span></span><a class="day-link" href="../index.html#d-2026-09-25"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p class="callout"><strong>Boris Cherny</strong>：在计算机历史博物馆见到 Donald Knuth；另外解释 Claude 在形式化方法上的做法，先给程序建模型、锁定棘手的状态机或易竞态代码，再找反例；还分享了 Claude 与桌面端近期变快背后的工程技巧。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong>（Claude Code, Anthropic）：分享在计算机历史博物馆见到 Donald Knuth；并解释 Claude 在形式化方法上的做法，包括为程序建模、针对棘手状态机或易发生竞态的代码寻找反例；还提到 Claude Code 与桌面应用近期提速背后的工程经验已写成博客。</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2102971275543216623" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2102971275543216623"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月24日 11:59</span><span class="lang-en">Sep 24 11:59</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2102898067133595992" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2102898067133595992"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月24日 07:09</span><span class="lang-en">Sep 24 07:09</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2102854267782705648" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2102854267782705648"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月24日 04:15</span><span class="lang-en">Sep 24 04:15</span></span></a></div></div></article></div></li><li class="day" id="d-2026-09-24"><div class="day-date"><time datetime="2026-09-24"><span class="lang-zh">9.24</span><span class="lang-en">Sep 24</span></time><span class="day-wd"><span class="lang-zh">周四</span><span class="lang-en">Thu</span></span><a class="day-link" href="../index.html#d-2026-09-24"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong>（Claude Code @anthropicai）用 <strong>Opus 5.5</strong> 形式化验证了 <strong>Claude Agent SDK</strong>，几个短 prompt 就换来 16 个 PR 修复各类 bug 与竞态条件，并表示 <strong>Lean</strong> 与 <strong>TLA+</strong> 可以结合使用。他还提到 Opus 5.5 与 Fable 5.1 各自把 <strong>HAProxy</strong> 从 C 移植到 Rust，两者几乎通过全部测试，但 Opus 5.5 只用 9.5 小时完成。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong>（Claude Code, Anthropic）： 用 <strong>Opus 5.5</strong> 对 <strong>Claude Agent SDK</strong> 做 <strong>Lean</strong> 形式化验证，几个简短提示词就产出 16 个 PR，修掉多个 bug 和竞态条件，并表示 <strong>TLA+</strong> 同样适用，有时会把 Lean 和 TLA+ 结合使用。他还让 Opus 5.5 与 Fable 5.1 各自把 <strong>HAProxy</strong> 从 C 移植到 Rust，两者几乎通过全部测试，但 Opus 5.5 用 9.5 小时完成。此外他提到 Opus 5.5 已是自己几周来的日常主力模型。</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2102543349102338309" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2102543349102338309"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月23日 07:39</span><span class="lang-en">Sep 23 07:39</span></span></a></div><div class="src"><a class="src-link" href="https://x.com/bcherny/status/2102439069053747549" target="_blank" rel="noopener" title="https://x.com/bcherny/status/2102439069053747549"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">9月23日 00:45</span><span class="lang-en">Sep 23 00:45</span></span></a></div></div></article></div></li><li class="day" id="d-2026-09-21"><div class="day-date"><time datetime="2026-09-21"><span class="lang-zh">9.21</span><span class="lang-en">Sep 21</span></time><span class="day-wd"><span class="lang-zh">周一</span><span class="lang-en">Mon</span></span><a class="day-link" href="../index.html#d-2026-09-21"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 用 <strong>Sonnet 5.5</strong> 修 Claude Code 的 bug，给出两个数字：快 <strong class="num">30%</strong>，用量少 <strong class="num">30%</strong>。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> showed <strong>Sonnet 5.5</strong> fixing a bug inside <strong>Claude Code</strong>, noting it runs <strong class="num">30%</strong> faster with <strong class="num">30%</strong> less usage.</p></div></article></div></li><li class="day" id="d-2026-09-19"><div class="day-date"><time datetime="2026-09-19"><span class="lang-zh">9.19</span><span class="lang-en">Sep 19</span></time><span class="day-wd"><span class="lang-zh">周六</span><span class="lang-en">Sat</span></span><a class="day-link" href="../index.html#d-2026-09-19"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong>（Claude Code @anthropicai）用 <strong>Sonnet 5.5</strong> 修 Claude Code 的一个 bug，称其快 <strong class="num">30%</strong>、用量少 <strong class="num">30%</strong>。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> showed <strong>Sonnet 5.5</strong> fixing a bug inside <strong>Claude Code</strong>, reporting it is <strong class="num">30%</strong> faster and uses <strong class="num">30%</strong> less usage.</p></div></article></div></li><li class="day" id="d-2026-09-17"><div class="day-date"><time datetime="2026-09-17"><span class="lang-zh">9.17</span><span class="lang-en">Sep 17</span></time><span class="day-wd"><span class="lang-zh">周四</span><span class="lang-en">Thu</span></span><a class="day-link" href="../index.html#d-2026-09-17"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Boris Cherny</strong> 用 <strong>Sonnet 5.5</strong> 修 Claude Code 的 bug，给出两个 <strong class="num">30%</strong>：快 <strong class="num">30%</strong>，用量少 <strong class="num">30%</strong>。</p></div><div class="post-body lang-en"><p><strong class="by">Boris Cherny</strong> of Claude Code at Anthropic showed <strong>Sonnet 5.5</strong> fixing a bug in Claude Code, noting it is <strong class="num">30%</strong> faster and uses <strong class="num">30%</strong> less usage.</p></div></article></div></li></ol>
+<footer class="site"><a href="../index.html"><span class="lang-zh">返回 AI News</span><span class="lang-en">Back to AI News</span></a> · <a href="#top"><span class="lang-zh">回到顶部</span><span class="lang-en">Top</span></a></footer>
+</div>
+<script>
+(function () {
+  var btns = document.querySelectorAll('.sw-btn');
+  function setLang(l) {
+    document.body.dataset.lang = l;
+    try { localStorage.setItem('fb-lang', l); } catch (e) {}
+    btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === l); });
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+  var saved = 'zh';
+  try { saved = localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}
+  setLang(saved);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amanda Askell · AI News</title>
+<meta name="description" content="Amanda Askell (@amandaaskell) — 往期发言时间线，共 1 条。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens: same paper-and-red system as index.html ---------- */
+:root {
+  --paper: #f7f6f2;
+  --sheet: #ffffff;
+  --ink: #1a1918;
+  --gray: #74716b;
+  --line: #e6e4de;
+  --red: #e02d1b;
+  --red-deep: #b32112;
+  --red-tint: #fbece8;
+  --serif: "Noto Serif SC", "Songti SC", "STSong", Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 16px; line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--red); color: #fff; }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+a { color: inherit; }
+
+.wrap { max-width: 840px; margin: 0 auto; padding: 30px 40px 90px; }
+@media (max-width: 640px) { .wrap { padding: 22px 18px 64px; } }
+
+/* ---------- language toggle (same pill as the digest page) ---------- */
+body[data-lang="zh"] .lang-en { display: none; }
+body[data-lang="en"] .lang-zh { display: none; }
+.lang-switch {
+  position: fixed; top: 16px; right: 16px; z-index: 50;
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--sheet); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(26, 25, 24, 0.06);
+}
+@media (max-width: 1360px) {
+  .lang-switch { position: static; margin: 0 auto 18px; width: max-content; box-shadow: none; }
+}
+.sw-btn {
+  border: none; background: transparent; cursor: pointer;
+  font-size: 12.5px; line-height: 1.3; font-family: inherit;
+  padding: 4px 14px; border-radius: 999px; color: var(--gray);
+  transition: color 0.15s ease;
+}
+.sw-btn:hover:not(.on) { color: var(--ink); }
+.sw-btn.on { background: var(--ink); color: #fff; }
+
+/* ---------- crumb ---------- */
+.crumb { margin-bottom: 30px; }
+.back {
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gray); text-decoration: none;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.back:hover { color: var(--red-deep); border-bottom-color: var(--red); }
+
+/* ---------- who: portrait, nameplate, stats ---------- */
+.who {
+  display: grid; grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 24px; align-items: start;
+  padding-bottom: 28px; border-bottom: 1px solid var(--line);
+}
+.who-ava {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--line); background: var(--paper); display: block;
+}
+.who-kicker {
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--red); font-weight: 700; margin-bottom: 8px;
+}
+.who-name {
+  font-family: var(--serif); font-weight: 900;
+  font-size: clamp(28px, 4.6vw, 42px); line-height: 1.12;
+  letter-spacing: -0.01em; margin: 0;
+}
+.who-handle {
+  font-size: 13px; color: var(--gray); letter-spacing: 0.03em; margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.who-stats {
+  margin-top: 14px; font-size: 13px; color: #55524d; line-height: 1.8;
+  font-variant-numeric: tabular-nums;
+}
+.who-x {
+  align-self: center; white-space: nowrap;
+  font-size: 12.5px; font-weight: 600; text-decoration: none;
+  padding: 8px 17px; border: 1px solid var(--line); border-radius: 999px;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.who-x:hover { color: var(--red-deep); border-color: var(--red); background: var(--red-tint); }
+
+/* ---------- spark: posting rhythm, one square per day ---------- */
+.spark-wrap {
+  margin: 26px 0 4px; padding: 15px 18px 12px;
+  background: var(--sheet); border: 1px solid var(--line); border-radius: 12px;
+}
+.spark-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 12px;
+}
+.spark-range { letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+.spark-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.spark-grid { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 2px; }
+.spark-col { display: flex; flex-direction: column; gap: 3px; flex: none; }
+.spark-cell {
+  width: 12px; height: 12px; border-radius: 2.5px; display: block;
+  background: #eeece6; transition: outline-color 0.12s ease;
+}
+.spark-cell.pad { background: transparent; }
+.spark-cell.lv1 { background: #f7dcd6; }
+.spark-cell.lv2 { background: #f0b4a8; }
+.spark-cell.lv3 { background: #e57763; }
+.spark-cell.lv4 { background: #c9301c; }
+a.spark-cell:hover { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.spark-legend {
+  display: flex; align-items: center; gap: 4px; flex: none;
+  font-size: 10px; color: var(--gray); letter-spacing: 0.02em;
+}
+.spark-legend .spark-cell { width: 9px; height: 9px; border-radius: 2px; }
+.spark-legend span { margin: 0 3px; }
+
+/* ---------- timeline ---------- */
+.tl { list-style: none; margin: 18px 0 0; padding: 0; }
+
+.month {
+  position: sticky; top: 0; z-index: 4;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; margin: 0; padding: 18px 0 10px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+  font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  font-weight: 700; color: var(--ink);
+}
+.m-lab::before {
+  content: ""; display: inline-block; width: 6px; height: 6px;
+  background: var(--red); margin-right: 9px; vertical-align: 1px;
+}
+.m-cnt { font-weight: 500; color: var(--gray); letter-spacing: 0.08em; }
+
+.day {
+  display: grid; grid-template-columns: 104px minmax(0, 1fr);
+  position: relative; padding-top: 26px;
+  scroll-margin-top: 58px;
+}
+.day::before {
+  content: ""; position: absolute; left: 104px; top: 0; bottom: 0;
+  width: 1px; background: #dedbd3;
+}
+.day:last-child::before { bottom: auto; height: 42px; }
+
+.day-date { text-align: right; padding-right: 24px; font-variant-numeric: tabular-nums; }
+.day-date time {
+  display: block; font-family: var(--serif); font-weight: 700;
+  font-size: 17px; line-height: 1.3; letter-spacing: 0.005em;
+}
+.day-wd {
+  display: block; font-size: 11px; color: var(--gray);
+  letter-spacing: 0.08em; margin-top: 3px;
+}
+.day-link {
+  display: inline-block; margin-top: 7px; font-size: 10.5px;
+  color: var(--gray); text-decoration: none; letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line); padding-bottom: 1px;
+}
+.day-link:hover { color: var(--red-deep); border-bottom-color: var(--red); }
+
+.day-main { position: relative; padding-left: 26px; }
+.day-main::before {
+  content: ""; position: absolute; left: -4.5px; top: 8px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--paper); border: 1.5px solid var(--red);
+}
+
+/* ---------- post card ---------- */
+.post {
+  background: var(--sheet); border: 1px solid var(--line);
+  border-radius: 12px; padding: 19px 22px 15px; margin-bottom: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.post:hover { border-color: #d9d6cf; box-shadow: 0 2px 12px rgba(26, 25, 24, 0.045); }
+.post-body { font-size: 15.5px; line-height: 1.86; color: #242322; }
+.post-body p { margin: 0 0 0.65em; }
+.post-body p:last-child { margin-bottom: 0; }
+.post-body strong { font-weight: 700; }
+.post-body em { font-style: italic; }
+.post-body a {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid rgba(224, 45, 27, 0.45);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.post-body a:hover { color: var(--red-deep); border-bottom-color: var(--red-deep); }
+.post-body strong.num { font-variant-numeric: tabular-nums; }
+.post-body .by {
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gray); font-weight: 700; margin-right: 4px;
+  font-family: var(--sans);
+}
+
+.zh-badge {
+  display: inline-block; margin: 8px 0 0; padding: 1px 8px;
+  font-size: 10.5px; letter-spacing: 0.04em; color: var(--gray);
+  border: 1px dashed var(--line); border-radius: 5px; line-height: 1.7;
+}
+
+.post-src { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 8px; }
+.post-src .src { display: inline-block; margin: 0; }
+.post-src a.src-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; line-height: 1.5; color: var(--gray);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 3px 11px; text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.post-src a.src-link:hover { color: var(--red-deep); border-color: var(--red); }
+.post-src .src-link svg { flex: none; }
+.post-src .src-time { color: var(--gray); font-weight: 400; }
+
+/* ---------- footer ---------- */
+.site {
+  margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line);
+  text-align: center; font-size: 12px; color: var(--gray); letter-spacing: 0.02em;
+}
+.site a { color: var(--gray); text-decoration: none; border-bottom: 1px solid rgba(224, 45, 27, 0.4); }
+.site a:hover { color: var(--red-deep); border-bottom-color: var(--red-deep); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 680px) {
+  .who { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; }
+  .who-ava { width: 64px; height: 64px; }
+  .who-x { grid-column: 1 / -1; justify-self: start; margin-top: 4px; }
+  .day { grid-template-columns: 1fr; padding-top: 22px; }
+  .day::before { display: none; }
+  .day-date {
+    text-align: left; padding: 0 0 10px; display: flex;
+    align-items: baseline; gap: 9px; flex-wrap: wrap;
+  }
+  .day-date time { font-size: 15px; }
+  .day-wd { margin: 0; }
+  .day-link { margin: 0 0 0 auto; }
+  .day-main { padding-left: 0; }
+  .day-main::before { display: none; }
+  .post { padding: 16px 16px 12px; }
+  .post-body { font-size: 15px; }
+  .spark-body { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .spark-grid { max-width: 100%; }
+}
+</style>
+</head>
+<body id="top" data-lang="zh">
+<div class="lang-switch" role="group" aria-label="语言 / Language"><button class="sw-btn" type="button" data-lang="zh">中文</button><button class="sw-btn" type="button" data-lang="en">EN</button></div>
+<div class="wrap">
+<nav class="crumb"><a class="back" href="../index.html">← <span class="lang-zh">全部期号</span><span class="lang-en">All issues</span></a></nav>
+<header class="who">
+<img class="who-ava" src="../avatars/amandaaskell.jpg" alt="" onerror="this.src='../avatars/fallback.png'">
+<div class="who-id">
+<div class="who-kicker"><span class="lang-zh">人物时间线</span><span class="lang-en">Timeline</span></div>
+<h1 class="who-name">Amanda Askell</h1>
+<div class="who-handle">@amandaaskell</div>
+<div class="who-stats"><span class="lang-zh">1 条摘录 · 1 天 · 2026 年 10 月 2 日 → 2026 年 10 月 2 日</span><span class="lang-en">1 posts · 1 days · Oct 2, 2026 → Oct 2, 2026</span></div>
+</div>
+<a class="who-x" href="https://x.com/amandaaskell" target="_blank" rel="noopener"><span class="lang-zh">在 X 打开</span><span class="lang-en">Open on X</span> ↗</a>
+</header>
+<section class="spark-wrap"><div class="spark-head"><span class="lang-zh">发文节奏</span><span class="lang-en">Posting rhythm</span><span class="spark-range">2026-10-02 → 2026-10-02</span></div><div class="spark-body"><div class="spark-grid"><div class="spark-col"><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span><span class="spark-cell pad"></span><a class="spark-cell lv1" href="#d-2026-10-02" title="2026 年 10 月 2 日 · 1" aria-label="2026 年 10 月 2 日 · 1"></a><span class="spark-cell pad"></span><span class="spark-cell pad"></span></div></div><div class="spark-legend"><span class="lang-zh">少</span><span class="lang-en">Less</span><i class="spark-cell lv1"></i><i class="spark-cell lv2"></i><i class="spark-cell lv3"></i><i class="spark-cell lv4"></i><span class="lang-zh">多</span><span class="lang-en">More</span></div></div></section>
+<ol class="tl"><li class="month"><span class="m-lab"><span class="lang-zh">2026 年 10 月</span><span class="lang-en">Oct 2026</span></span><span class="m-cnt"><span class="lang-zh">1 条</span><span class="lang-en">1 post</span></span></li><li class="day" id="d-2026-10-02"><div class="day-date"><time datetime="2026-10-02"><span class="lang-zh">10.2</span><span class="lang-en">Oct 2</span></time><span class="day-wd"><span class="lang-zh">周五</span><span class="lang-en">Fri</span></span><a class="day-link" href="../index.html#d-2026-10-02"><span class="lang-zh">查看本期</span><span class="lang-en">View issue</span></a></div><div class="day-main"><article class="post"><div class="post-body lang-zh"><p><strong class="by">Amanda Askell</strong> 分享了一个冷知识：钽在 1802 年被发现，其一种同位素半衰期长到我们可能永远看不到它衰变，这是「nominative determinism」的绝佳案例。</p></div><div class="post-body lang-en"><p>Amanda Askell observed that tantalum being discovered in 1802 and turning out to have an isotope with a half life so long we might never see it decay is a great example of nominative determinism.</p></div><div class="post-src"><div class="src"><a class="src-link" href="https://x.com/AmandaAskell/status/2105901984889086203" target="_blank" rel="noopener" title="https://x.com/AmandaAskell/status/2105901984889086203"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z"></path></svg><span class="lang-zh">X 原文</span><span class="lang-en">Original post</span><span class="src-time"><span class="lang-zh">10月2日 14:05</span><span class="lang-en">Oct 2 14:05</span></span></a></div></div></article></div></li></ol>
+<footer class="site"><a href="../index.html"><span class="lang-zh">返回 AI News</span><span class="lang-en">Back to AI News</span></a> · <a href="#top"><span class="lang-zh">回到顶部</span><span class="lang-en">Top</span></a></footer>
+</div>
+<script>
+(function () {
+  var btns = document.querySelectorAll('.sw-btn');
+  function setLang(l) {
+    document.body.dataset.lang = l;
+    try { localStorage.setItem('fb-lang', l); } catch (e) {}
+    btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === l); });
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+  var saved = 'zh';
+  try { saved = localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}
+  setLang(saved);
+})();
+</script>
+</body>
+</html>
