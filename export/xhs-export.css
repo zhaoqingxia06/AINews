@@ -1,0 +1,131 @@
+/* ---------- 小红书导出 ---------- */
+.lang-switch { align-items: center; }
+.xhs-sep { width: 1px; height: 16px; background: var(--line); margin: 0 4px; flex: none; }
+.sw-btn.xhs-open {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: #fff; background: var(--ink); font-weight: 600;
+  padding: 4px 13px 4px 11px; border-radius: 999px;
+}
+.sw-btn.xhs-open:hover { color: #fff; background: var(--red-deep); }
+.sw-btn.xhs-open svg { width: 12px; height: 12px; flex: none; }
+
+body.xhs-lock { overflow: hidden; }
+.xhs {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 28px;
+}
+.xhs[hidden] { display: none; }
+.xhs-mask { position: absolute; inset: 0; background: rgba(26, 25, 24, 0.52); backdrop-filter: blur(5px); }
+.xhs-panel {
+  position: relative; display: flex; flex-direction: column;
+  width: min(1280px, 100%); max-height: min(900px, calc(100vh - 56px));
+  background: var(--sheet); border-radius: 18px; overflow: hidden;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.32);
+  animation: xhs-in 0.22s ease-out;
+}
+@keyframes xhs-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } }
+.xhs-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 22px 28px 16px; border-bottom: 1px solid var(--line);
+}
+.xhs-kicker { font-size: 10.5px; letter-spacing: 0.18em; color: var(--red); font-weight: 700; }
+.xhs-head h2 { margin: 4px 0 0; font-family: var(--serif); font-size: 25px; line-height: 1.25; font-weight: 900; }
+.xhs-close {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+  background: transparent; color: var(--gray); font-size: 20px; line-height: 1; cursor: pointer;
+}
+.xhs-close:hover { background: var(--red-tint); color: var(--red-deep); border-color: var(--red); }
+.xhs-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) 344px;
+  min-height: 0; flex: 1; overflow: hidden;
+}
+.xhs-pages {
+  display: flex; align-items: flex-start; gap: 18px;
+  overflow: auto; padding: 24px 24px 30px; background: var(--paper);
+  scroll-snap-type: x mandatory;
+}
+.xhs-card { margin: 0; flex: none; width: 270px; scroll-snap-align: start; }
+.xhs-card img {
+  display: block; width: 100%; height: auto; border-radius: 9px;
+  border: 1px solid var(--line); background: #fff;
+  box-shadow: 0 12px 28px rgba(26, 25, 24, 0.10); cursor: zoom-in;
+}
+.xhs-card figcaption {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 10px; font-size: 11.5px; color: var(--gray);
+}
+.xhs-card figcaption b { color: var(--ink); font-weight: 700; }
+.xhs-dl {
+  border: none; background: transparent; color: var(--red-deep);
+  font-size: 11.5px; font-weight: 700; cursor: pointer; padding: 2px 0;
+}
+.xhs-dl:hover { text-decoration: underline; }
+.xhs-loading { margin: auto; padding: 80px 20px; font-size: 13px; color: var(--gray); text-align: center; }
+.xhs-spinner {
+  width: 26px; height: 26px; margin: 0 auto 12px; border-radius: 50%;
+  border: 2px solid var(--line); border-top-color: var(--red);
+  animation: xhs-spin 0.9s linear infinite;
+}
+@keyframes xhs-spin { to { transform: rotate(360deg); } }
+.xhs-error { margin: auto; padding: 60px 24px; font-size: 13px; color: var(--gray); text-align: center; line-height: 1.9; }
+
+.xhs-side {
+  display: flex; flex-direction: column; min-height: 0;
+  padding: 20px 24px 22px; border-left: 1px solid var(--line); background: var(--sheet);
+}
+.xhs-meta { font-size: 12px; color: var(--gray); margin-bottom: 14px; line-height: 1.7; }
+.xhs-meta b { color: var(--ink); font-weight: 700; }
+.xhs-label { font-size: 12px; font-weight: 700; margin-bottom: 7px; letter-spacing: 0.01em; }
+.xhs-caption {
+  flex: 1; min-height: 170px; resize: none;
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 13px;
+  font-family: var(--sans); font-size: 12.5px; line-height: 1.8; color: var(--ink);
+  background: var(--paper);
+}
+.xhs-caption:focus { outline: 2px solid var(--red); outline-offset: -1px; }
+.xhs-actions { display: flex; gap: 8px; margin-top: 14px; }
+.xhs-btn {
+  flex: 1; border-radius: 999px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); font-family: var(--sans);
+  font-size: 12.5px; font-weight: 700; padding: 10px 12px; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.xhs-btn:hover { border-color: var(--red); color: var(--red-deep); background: var(--red-tint); }
+.xhs-btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.xhs-btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); color: #fff; }
+.xhs-btn:disabled { opacity: 0.45; cursor: default; }
+.xhs-hint { margin: 12px 0 0; font-size: 11px; color: var(--gray); line-height: 1.7; }
+.xhs-status { margin: 8px 0 0; min-height: 16px; font-size: 11.5px; color: var(--red-deep); }
+
+.xhs-light {
+  position: fixed; inset: 0; z-index: 300; display: flex;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(15, 14, 13, 0.9); cursor: zoom-out;
+}
+.xhs-light[hidden] { display: none; }
+.xhs-light img {
+  max-width: 100%; max-height: 100%; border-radius: 6px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 1440px) {
+  /* 这个宽度以下顶部胶囊会和日历卡片打架；导出按钮独立悬浮，正文读到哪里都能点 */
+  .xhs-sep { display: none; }
+  .sw-btn.xhs-open {
+    position: fixed; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 70; padding: 11px 18px; font-size: 13.5px;
+    box-shadow: 0 10px 30px rgba(26, 25, 24, 0.28);
+  }
+}
+@media (max-width: 900px) {
+  .xhs { padding: 0; align-items: stretch; }
+  .xhs-panel { width: 100%; height: 100%; max-height: none; border-radius: 0; }
+  .xhs-head { padding: 16px 18px 12px; }
+  .xhs-close { width: 30px; height: 30px; }
+  .xhs-head h2 { font-size: 21px; }
+  .xhs-body { display: block; overflow: auto; }
+  .xhs-pages { padding: 18px; justify-content: flex-start; }
+  .xhs-card { width: 250px; }
+  .xhs-side { border-left: none; border-top: 1px solid var(--line); padding: 18px; }
+  .xhs-caption { min-height: 150px; flex: none; }
+}

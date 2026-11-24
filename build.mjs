@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 const scriptDir = dirname(fileURLToPath(import.meta.url)); // repo root
 const DIGEST_DIR = join(scriptDir, 'digests');
 const OUT = join(scriptDir, 'index.html');
+const EXPORT_DIR = join(scriptDir, 'export');
 
 // ---------- markdown-lite renderer (headings / bold / italic / links / hr) ----------
 
@@ -340,6 +341,12 @@ async function main() {
   const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const zhDate = `${+todayKey.slice(0, 4)} 年 ${+todayKey.slice(5, 7)} 月 ${+todayKey.slice(8, 10)} 日`;
   const enDate = `${MONTHS_EN[+todayKey.slice(5, 7) - 1]} ${+todayKey.slice(8, 10)}, ${todayKey.slice(0, 4)}`;
+
+  // 小红书导出：样式与运行时在构建期内联，站点继续保持单文件、零外部依赖
+  const [xhsCss, xhsJs] = await Promise.all([
+    readFile(join(EXPORT_DIR, 'xhs-export.css'), 'utf-8'),
+    readFile(join(EXPORT_DIR, 'xhs-export.js'), 'utf-8'),
+  ]);
 
   const kwChips = (md) => parseKeywords(md).kw.map((k) => `<span class="kw">#${escapeHtml(k)}</span>`).join('');
   const avatarFiles = await loadAvatarFiles();
@@ -714,12 +721,19 @@ async function main() {
   }
   footer.site a { color: var(--gray); border-bottom: 1px solid rgba(224, 45, 27, 0.45); }
   footer.site a:hover { color: var(--red-deep); border-bottom-color: var(--red-deep); }
+
+${xhsCss}
 </style>
 </head>
 <body id="top" data-lang="zh">
-<div class="lang-switch" role="group" aria-label="语言 / Language">
+<div class="lang-switch" role="group" aria-label="语言切换与导出 / Language &amp; export">
   <button class="sw-btn" type="button" data-lang="zh">中文</button>
   <button class="sw-btn" type="button" data-lang="en">EN</button>
+  <span class="xhs-sep" aria-hidden="true"></span>
+  <button class="sw-btn xhs-open" type="button" title="导出当前这一天的日报卡片" aria-label="导出当前这一天的日报卡片">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8m0 0 3-3m-3 3L5 7"/><path d="M2.5 11.5v1.2c0 .7.6 1.3 1.3 1.3h8.4c.7 0 1.3-.6 1.3-1.3v-1.2"/></svg>
+    <span>导出</span>
+  </button>
 </div>
 <div class="wrap">
   <header class="mast">
@@ -1140,6 +1154,9 @@ const LATEST_KEY = ${JSON.stringify(latestKey)};
   setLang(saved);
 })();
 
+</script>
+<script>
+${xhsJs}
 </script>
 </body>
 </html>
