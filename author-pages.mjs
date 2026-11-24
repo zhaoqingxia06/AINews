@@ -222,15 +222,22 @@ export function renderAuthorPage(a) {
 }
 
 const TOGGLE_JS = `(function () {
+  // own key: fb-lang is shared with everything else on this origin, so any
+  // other project can leave a value behind and flip this site into a state
+  // it has no button for
+  var KEY = 'ainews-lang';
   var btns = document.querySelectorAll('.sw-btn');
+  // two states, full stop: anything that is not exactly 'en' means Chinese
+  function norm(l) { return l === 'en' ? 'en' : 'zh'; }
   function setLang(l) {
+    l = norm(l);
     document.body.dataset.lang = l;
-    try { localStorage.setItem('fb-lang', l); } catch (e) {}
+    try { localStorage.setItem(KEY, l); } catch (e) {}
     btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === l); });
   }
   btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
   var saved = 'zh';
-  try { saved = localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}
+  try { saved = localStorage.getItem(KEY) || localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}
   setLang(saved);
 
   // on a narrow sheet, shed the trailing all-ahead columns so the field

@@ -26,7 +26,8 @@ a { color: inherit; }
 @media (max-width: 640px) { .wrap { padding: 22px 18px 64px; } }
 
 /* ---------- language toggle (same pill as the digest page) ---------- */
-body[data-lang="zh"] .lang-en { display: none; }
+/* unknown or missing data-lang falls back to Chinese, never to both */
+body:not([data-lang="en"]) .lang-en { display: none; }
 body[data-lang="en"] .lang-zh { display: none; }
 .lang-switch {
   position: fixed; top: 16px; right: 16px; z-index: 50;
