@@ -109,7 +109,8 @@ body[data-lang="en"] .lang-zh { display: none; }
   width: 12px; height: 12px; border-radius: 2.5px; display: block;
   background: #eeece6; transition: outline-color 0.12s ease;
 }
-.spark-cell.pad { background: transparent; }
+/* days outside this person's span: present but ghosted, never a hole */
+.spark-cell.pad { background: rgba(26, 25, 24, 0.055); }
 .spark-cell.lv1 { background: #f7dcd6; }
 .spark-cell.lv2 { background: #f0b4a8; }
 .spark-cell.lv3 { background: #e57763; }

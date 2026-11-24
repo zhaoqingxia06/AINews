@@ -82,7 +82,6 @@ function renderSpark(dayKeys, counts, lang) {
 
   const legend = [1, 2, 3, 4].map((n) => '<i class="spark-cell lv' + n + '"></i>').join('');
   return '<div class="spark-head">'
-    + '<span class="lang-zh">发文节奏</span><span class="lang-en">Posting rhythm</span>'
     + '<span class="spark-range">' + esc(dayKeys[0]) + ' → ' + esc(dayKeys[dayKeys.length - 1]) + '</span>'
     + '</div>'
     + '<div class="spark-body">'
@@ -180,7 +179,7 @@ export function renderAuthorPage(a) {
     + '<a class="who-x" href="https://x.com/' + esc(a.handle) + '" target="_blank" rel="noopener">'
     + '<span class="lang-zh">在 X 打开</span><span class="lang-en">Open on X</span> ↗</a>\n'
     + '</header>\n'
-    + '<section class="spark-wrap">' + renderSpark(dayKeys, a.dayCounts, 'zh') + '</section>\n'
+    + '<section class="spark-wrap" aria-label="发文节奏 / Posting rhythm">' + renderSpark(dayKeys, a.dayCounts, 'zh') + '</section>\n'
     + '<ol class="tl">' + rail + '</ol>\n'
     + '<footer class="site">'
     + '<a href="../index.html"><span class="lang-zh">返回 AI News</span><span class="lang-en">Back to AI News</span></a>'
