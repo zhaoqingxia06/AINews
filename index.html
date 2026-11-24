@@ -7864,7 +7864,11 @@ const LATEST_KEY = "2026-11-24";
       var hintY = topStart - 40;
       var insEnd = hasInsight ? bodyY + insFit.lines.length * insLh : y;
       if (hintY > insEnd + 16) {
-        drawRight(ctx, '左滑查看今日全部 ' + d.items.length + ' 条资讯 →', PAGE_W - M, hintY, 17, 600, RED_DEEP);
+        var shownCount = d._shown || d.items.length;
+        var hintText = shownCount < d.items.length
+          ? '左滑查看今日精选 ' + shownCount + ' 条资讯 →'
+          : '左滑查看今日全部 ' + shownCount + ' 条资讯 →';
+        drawRight(ctx, hintText, PAGE_W - M, hintY, 17, 600, RED_DEEP);
       }
     }
 
@@ -7898,15 +7902,18 @@ const LATEST_KEY = "2026-11-24";
   }
 
   // ---------- page 2+: all stories ----------
-  function renderStories(d, out) {
+  function renderStories(d, out, opts) {
     var items = d.items;
     if (!items.length) return out;
+    var threeUp = !!(opts && opts.threeUp);
 
-    // 每页最多 5 条，所有资讯平均分配，避免最后一页只剩一两条
-    var perPage = 5;
-    var totalPages = Math.max(1, Math.ceil(items.length / perPage));
-    var base = Math.floor(items.length / totalPages);
-    var extra = items.length % totalPages;
+    // threeUp：固定 2 页资讯，最多保留 12 条（保证每页至少 2 行），用于「一篇笔记 3 张图」
+    var shown = threeUp ? Math.min(12, items.length) : items.length;
+    var totalPages = threeUp
+      ? Math.max(1, Math.min(2, shown))
+      : Math.max(1, Math.ceil(items.length / 5));
+    var base = Math.floor(shown / totalPages);
+    var extra = shown % totalPages;
     var cursor = 0;
 
     for (var pageIndex = 0; pageIndex < totalPages; pageIndex++) {
@@ -7917,7 +7924,10 @@ const LATEST_KEY = "2026-11-24";
       drawText(ctx, '今日资讯', M, 158, 56, 900, INK, SERIF);
       var tw = textWidth(ctx, '今日资讯', 56, 900, SERIF);
       drawTracked(ctx, 'ALL STORIES', M + tw + 20, 184, 11, 700, GRAY, 2);
-      drawRight(ctx, '共 ' + items.length + ' 条', PAGE_W - M, 176, 14, 600, GRAY);
+      var countLabel = threeUp && shown < items.length
+        ? '精选 ' + shown + ' / 共 ' + items.length + ' 条'
+        : '共 ' + items.length + ' 条';
+      drawRight(ctx, countLabel, PAGE_W - M, 176, 14, 600, GRAY);
       rule(ctx, M, 244, PAGE_W - M, 2, INK);
 
       var y = 274;
@@ -7939,7 +7949,8 @@ const LATEST_KEY = "2026-11-24";
       // 末页收个尾，避免底部留下突兀的空白
       if (pageIndex === totalPages - 1 && y + 56 < CONTENT_BOTTOM) {
         rule(ctx, PAGE_W / 2 - 24, y + 24, PAGE_W / 2 + 24, 1, '#c9c5bb');
-        drawCentered(ctx, '今日 ' + items.length + ' 条 · 已全部收录', PAGE_W / 2, y + 40, 12, 500, GRAY);
+        var endText = shown < items.length ? '今日精选 ' + shown + ' 条 · 全文见网站' : '今日 ' + items.length + ' 条 · 已全部收录';
+        drawCentered(ctx, endText, PAGE_W / 2, y + 40, 12, 500, GRAY);
       }
 
       cursor += count;
@@ -7948,9 +7959,10 @@ const LATEST_KEY = "2026-11-24";
     return out;
   }
 
-  function makePages(d) {
+  function makePages(d, opts) {
+    d._shown = (opts && opts.threeUp) ? Math.min(12, d.items.length) : d.items.length;
     var pages = [renderInsight(d)];
-    renderStories(d, pages);
+    renderStories(d, pages, opts);
     pages.forEach(function (c, i) { footer(c.getContext('2d'), i + 1, pages.length, d); });
     return pages;
   }
@@ -8183,6 +8195,35 @@ const LATEST_KEY = "2026-11-24";
       b.addEventListener('click', open);
     });
   }
+
+  // 自动化入口：导出工作流直接拿 PNG dataURL，不依赖按钮和浏览器下载事件
+  window.AINewsExport = {
+    render: function (opts) {
+      var d = extract();
+      if (!d) return Promise.reject(new Error('no-article'));
+      var fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      var done = false;
+      return Promise.race([fonts, new Promise(function (r) { setTimeout(r, 2500); })]).then(function () {
+        if (done) return null;
+        done = true;
+        var pages = makePages(d, opts || {});
+        return {
+          key: d.key,
+          issue: d.issue,
+          date: d.date,
+          title: d.title,
+          deck: d.deck,
+          insight: d.insight,
+          tags: d.tags,
+          top3: d.top3,
+          items: d.items,
+          shownItems: d._shown || d.items.length,
+          caption: buildCaption(d),
+          images: pages.map(function (c) { return c.toDataURL('image/png'); })
+        };
+      });
+    }
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
