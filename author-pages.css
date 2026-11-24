@@ -93,36 +93,34 @@ body[data-lang="en"] .lang-zh { display: none; }
 
 /* ---------- spark: posting rhythm, one square per day ---------- */
 .spark-wrap {
-  margin: 26px 0 4px; padding: 15px 18px 12px;
+  margin: 26px 0 4px; padding: 15px 18px 13px;
   background: var(--sheet); border: 1px solid var(--line); border-radius: 12px;
 }
 .spark-head {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--gray); margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px 16px;
+  flex-wrap: wrap; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 11px;
 }
 .spark-range { letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
-.spark-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
-.spark-grid { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 2px; }
+.spark-grid { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
 .spark-col { display: flex; flex-direction: column; gap: 3px; flex: none; }
-.spark-cell {
-  width: 12px; height: 12px; border-radius: 2.5px; display: block;
-  background: #eeece6; transition: outline-color 0.12s ease;
-}
-/* days outside this person's span: present but ghosted, never a hole */
-.spark-cell.pad { background: rgba(26, 25, 24, 0.055); }
+.spark-cell { width: 12px; height: 12px; border-radius: 2.5px; display: block; background: #eeece6; }
+/* how much they posted that day */
 .spark-cell.lv1 { background: #f7dcd6; }
 .spark-cell.lv2 { background: #f0b4a8; }
 .spark-cell.lv3 { background: #e57763; }
 .spark-cell.lv4 { background: #c9301c; }
+/* every day still ahead: one step lighter than an untouched square */
+.spark-cell.fut { background: #f3f1ec; }
 a.spark-cell:hover { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.spark-cell.is-today { box-shadow: inset 0 0 0 1.5px var(--red); }
+
 .spark-legend {
-  display: flex; align-items: center; gap: 4px; flex: none;
-  font-size: 10px; color: var(--gray); letter-spacing: 0.02em;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px; flex: none;
+  font-size: 10px; color: var(--gray); letter-spacing: 0.02em; text-transform: none;
 }
 .spark-legend .spark-cell { width: 9px; height: 9px; border-radius: 2px; }
-.spark-legend span { margin: 0 3px; }
-
+.lg-lab { margin: 0 3px; }
 /* ---------- timeline ---------- */
 .tl { list-style: none; margin: 18px 0 0; padding: 0; }
 
@@ -245,6 +243,7 @@ a.spark-cell:hover { outline: 1.5px solid var(--ink); outline-offset: 1px; }
   .day-main::before { display: none; }
   .post { padding: 16px 16px 12px; }
   .post-body { font-size: 15px; }
-  .spark-body { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .spark-head { align-items: flex-start; }
+  .spark-legend { font-size: 9.5px; }
   .spark-grid { max-width: 100%; }
 }

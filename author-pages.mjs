@@ -5,6 +5,7 @@
 
 import { readFileSync } from 'fs';
 
+
 const CSS = readFileSync(new URL('./author-pages.css', import.meta.url), 'utf-8');
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -33,23 +34,46 @@ function dayMeta(key, lang) {
     : { short: MONTHS[p[1] - 1] + ' ' + p[2], long: MONTHS[p[1] - 1] + ' ' + p[2] + ', ' + p[0], wd: WD_EN[wd] };
 }
 
-// one square per calendar day, GitHub-style: weeks as columns, Mon..Sun rows
-function sparkColumns(dayKeys) {
+// the calendar day of "now" in the reader's own timezone — not UTC, which
+// would put the marker on the wrong square east of Greenwich after midnight
+function todayKey() {
+  const n = new Date();
+  return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+}
+
+// the field is drawn full width: 48 week-columns of 12px squares + 3px gaps
+// fills the 760px sheet exactly, and it grows further for long timelines or
+// when today sits beyond the end of that span.
+const FIELD_WEEKS = 48;
+
+// one square per calendar day, GitHub-style: weeks as columns, Mon..Sun rows.
+// The field never stops at the last post — it runs through today and on into
+// the unmarked future, so the sheet has no dead space on the right.
+function sparkColumns(dayKeys, today) {
   const days = dayKeys.slice().sort();
   if (!days.length) return [];
-  const first = utc(days[0]);
-  const last = utc(days[days.length - 1]);
-  const start = new Date(first);
+  const firstKey = days[0];
+  const lastKey = days[days.length - 1];
+  const start = utc(firstKey);
   start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+
+  const horizon = new Date(start.getTime() + (FIELD_WEEKS * 7 - 1) * 864e5);
+  let end = horizon;
+  for (const bound of [utc(today), utc(lastKey)]) if (bound > end) end = bound;
+  end = new Date(end.getTime());
+  end.setUTCDate(end.getUTCDate() + (6 - ((end.getUTCDay() + 6) % 7))); // snap to Sunday
+
   const cols = [];
   const cursor = new Date(start);
-  while (cursor <= last) {
+  while (cursor <= end) {
     const col = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(cursor);
       d.setUTCDate(d.getUTCDate() + i);
       const k = keyOf(d);
-      col.push(k >= days[0] && k <= days[days.length - 1] ? k : null);
+      // before this person's first post / after today / a day they could post on
+      const state = k < firstKey ? 'pad' : (k > today ? 'fut' : 'day');
+      col.push({ key: k, state: state, today: k === today });
     }
     cols.push(col);
     cursor.setUTCDate(cursor.getUTCDate() + 7);
@@ -57,6 +81,8 @@ function sparkColumns(dayKeys) {
   return cols;
 }
 
+// one square per day: red where they posted, paper-grey where they didn't,
+// and a paler grey for the days still ahead — the GitHub contribution rule
 function level(n) {
   if (!n) return 0;
   if (n === 1) return 1;
@@ -66,31 +92,37 @@ function level(n) {
 }
 
 function renderSpark(dayKeys, counts, lang) {
-  const cols = sparkColumns(dayKeys, counts);
+  const today = todayKey();
+  const cols = sparkColumns(dayKeys, today);
   const cells = cols.map((col) => {
-    const inner = col.map((k) => {
-      if (!k) return '<span class="spark-cell pad"></span>';
-      const n = counts[k] || 0;
+    const inner = col.map((c) => {
+      const n = counts[c.key] || 0;
+      if (c.state === 'fut') return '<span class="spark-cell fut" aria-hidden="true"></span>';
+      if (c.state === 'pad') return '<span class="spark-cell" aria-hidden="true"></span>';
       const cls = 'spark-cell lv' + level(n);
-      if (!n) return '<span class="' + cls + '" title="' + k + '"></span>';
-      const m = dayMeta(k, lang);
+      const m = dayMeta(c.key, lang);
+      if (c.today) {
+        const label = m.long + ' · ' + (lang === 'zh' ? '今天' : 'today') + (n ? ' · ' + n + (lang === 'zh' ? ' 条' : '') : '');
+        return '<span class="' + cls + ' is-today" aria-label="' + esc(label) + '" title="' + esc(label) + '"></span>';
+      }
+      if (!n) return '<span class="' + cls + '" aria-hidden="true" title="' + c.key + '"></span>';
       const label = esc(m.long + ' · ' + n);
-      return '<a class="' + cls + '" href="#d-' + k + '" title="' + label + '" aria-label="' + label + '"></a>';
+      return '<a class="' + cls + '" href="#d-' + c.key + '" title="' + label + '" aria-label="' + label + '"></a>';
     }).join('');
     return '<div class="spark-col">' + inner + '</div>';
   }).join('');
 
-  const legend = [1, 2, 3, 4].map((n) => '<i class="spark-cell lv' + n + '"></i>').join('');
+  const ramp = [1, 2, 3, 4].map((n) => '<i class="spark-cell lv' + n + '"></i>').join('');
   return '<div class="spark-head">'
     + '<span class="spark-range">' + esc(dayKeys[0]) + ' → ' + esc(dayKeys[dayKeys.length - 1]) + '</span>'
+    + '<div class="spark-legend">'
+    + '<span class="lg-lab"><span class="lang-zh">少</span><span class="lang-en">Less</span></span>'
+    + ramp
+    + '<span class="lg-lab"><span class="lang-zh">多</span><span class="lang-en">More</span></span>'
     + '</div>'
-    + '<div class="spark-body">'
-    + '<div class="spark-grid">' + cells + '</div>'
-    + '<div class="spark-legend"><span class="lang-zh">少</span><span class="lang-en">Less</span>' + legend
-    + '<span class="lang-zh">多</span><span class="lang-en">More</span></div>'
-    + '</div>';
+    + '</div>'
+    + '<div class="spark-grid">' + cells + '</div>';
 }
-
 export function renderAuthorPage(a) {
   const posts = a.posts;
   const total = posts.length;
@@ -189,17 +221,35 @@ export function renderAuthorPage(a) {
     + '<script>\n' + TOGGLE_JS + '\n</script>\n</body>\n</html>\n';
 }
 
-const TOGGLE_JS = [
-  '(function () {',
-  "  var btns = document.querySelectorAll('.sw-btn');",
-  '  function setLang(l) {',
-  '    document.body.dataset.lang = l;',
-  "    try { localStorage.setItem('fb-lang', l); } catch (e) {}",
-  "    btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === l); });",
-  '  }',
-  "  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });",
-  "  var saved = 'zh';",
-  "  try { saved = localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}",
-  '  setLang(saved);',
-  '})();',
-].join('\n');
+const TOGGLE_JS = `(function () {
+  var btns = document.querySelectorAll('.sw-btn');
+  function setLang(l) {
+    document.body.dataset.lang = l;
+    try { localStorage.setItem('fb-lang', l); } catch (e) {}
+    btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === l); });
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+  var saved = 'zh';
+  try { saved = localStorage.getItem('fb-lang') || 'zh'; } catch (e) {}
+  setLang(saved);
+
+  // on a narrow sheet, shed the trailing all-ahead columns so the field
+  // still ends flush with the right edge instead of scrolling sideways
+  var grid = document.querySelector('.spark-grid');
+  if (grid) {
+    var cols = [].slice.call(grid.querySelectorAll('.spark-col'));
+    var fit = function () {
+      cols.forEach(function (c) { c.style.display = ''; });
+      for (var i = cols.length - 1; i >= 0 && grid.scrollWidth > grid.clientWidth + 1; i--) {
+        var cells = cols[i].querySelectorAll('.spark-cell'), ahead = true;
+        for (var k = 0; k < cells.length; k++) {
+          if (cells[k].className.indexOf('fut') < 0) { ahead = false; break; }
+        }
+        if (!ahead) break;
+        cols[i].style.display = 'none';
+      }
+    };
+    fit();
+    window.addEventListener('resize', fit);
+  }
+})();`;
